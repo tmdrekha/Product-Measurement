@@ -1,0 +1,675 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+	<name>Tmd Product Measurement</name>
+	<id>Tmd Product Measurement</id>
+	<version>1.0</version>
+	<code>#LC</code>
+	<author>TMD(opencartextensions.in)</author>
+	<link>http://opencartextensions.in/</link>
+	
+<file path="admin/controller/common/column_left.php">    
+	<operation error="skip">
+		<search><![CDATA[// Catalog]]></search>
+		<add position="before"><![CDATA[
+		/* 25 10 2020 */
+			if ($this->user->hasPermission('access', 'extension/module/tmd_productdimension')) {		
+				$data['menus'][] = array(
+					'id'       => 'menu-dashboard',
+					'icon'	   => 'fa-cogs',
+					'name'	   => $this->language->get('text_productdimension'),
+					'href'     => $this->url->link('extension/module/tmd_productdimension', 'token=' . $this->session->data['token'], true),
+					'children' => array()
+				);		
+			}
+		/* 25 10 2020 */
+		]]></add>
+	</operation> 				
+</file>
+<file path="admin/language/*/common/column_left.php">    
+	<operation error="skip">
+		<search><![CDATA[// Text]]></search>
+		<add position="after"><![CDATA[
+			/* 25 10 2021 */
+			$_['text_productdimension']                 = 'Tmd Product Dimension';
+			/* 25 10 2021 */
+		]]></add>
+	</operation> 				
+</file>
+
+<file path="admin/controller/catalog/product.php"> 
+	<operation error="skip">
+		<search><![CDATA[if (isset($this->request->post['product_layout'])) {]]></search>
+		<add position="before"><![CDATA[
+			/* 25 10 2021 */
+				$setting_info = $this->model_catalog_product->getSqrSetting($this->request->get['product_id']);
+
+				if (isset($this->request->post['width_min'])) {
+					$data['width_min'] = $this->request->post['width_min'];
+				} elseif (!empty($setting_info)) {
+					$data['width_min'] = $setting_info['width_min'];
+				} else {
+					$data['width_min'] = '';
+				}
+
+				if (isset($this->request->post['width_max'])) {
+					$data['width_max'] = $this->request->post['width_max'];
+				} elseif (!empty($setting_info)) {
+					$data['width_max'] = $setting_info['width_max'];
+				} else {
+					$data['width_max'] = '';
+				}
+
+				if (isset($this->request->post['height_min'])) {
+					$data['height_min'] = $this->request->post['height_min'];
+				} elseif (!empty($setting_info)) {
+					$data['height_min'] = $setting_info['height_min'];
+				} else {
+					$data['height_min'] = '';
+				}
+
+				if (isset($this->request->post['height_max'])) {
+					$data['height_max'] = $this->request->post['height_max'];
+				} elseif (!empty($setting_info)) {
+					$data['height_max'] = $setting_info['height_max'];
+				} else {
+					$data['height_max'] = '';
+				}
+
+				if (isset($this->request->post['product_price'])) {
+					$product_prices = $this->request->post['product_price'];
+				} elseif (isset($this->request->get['product_id'])) {
+					$product_prices = $this->model_catalog_product->getProductPrices($this->request->get['product_id']);
+				} else {
+					$product_prices = array();
+				}
+
+				$data['product_prices'] = array();
+
+				foreach ($product_prices as $product_price) {
+					$data['product_prices'][] = array(
+						'from_sqr'  => $product_price['from_sqr'],
+						'to_sqr'    => $product_price['to_sqr'],
+						'price'		=> $product_price['price'],
+						'discount'	=> $product_price['discount']
+					);
+				}
+			/* 25 10 2021 */
+		]]></add>
+	</operation> 
+
+	<operation error="skip">
+		<search><![CDATA[$data['token'] = $this->session->data['token'];]]></search>
+		<add position="before"><![CDATA[
+			/* 25 10 2021 */
+			$data['entry_fromsqr']    = $this->language->get('entry_fromsqr');
+			$data['entry_tosqr']      = $this->language->get('entry_tosqr');
+			$data['entry_sqrprice']   = $this->language->get('entry_sqrprice');
+			$data['entry_discount']   = $this->language->get('entry_discount');
+			$data['tab_p_price']      = $this->language->get('tab_p_price');
+			$data['entry_sqr_width']  = $this->language->get('entry_sqr_width');
+			$data['entry_width_min']  = $this->language->get('entry_width_min');
+			$data['entry_width_max']  = $this->language->get('entry_width_max');
+			$data['entry_sqr_height'] = $this->language->get('entry_sqr_height');
+			$data['entry_height_min'] = $this->language->get('entry_height_min');
+			$data['entry_height_max'] = $this->language->get('entry_height_max');
+			$data['entry_sqr_cm']     = $this->language->get('entry_sqr_cm');
+
+			$data['column_from'] 		    = $this->language->get('column_from');
+			$data['column_to'] 		        = $this->language->get('column_to');
+			$data['column_price'] 		    = $this->language->get('column_price');
+			$data['column_quantity'] 		= $this->language->get('column_quantity');
+			$data['column_action'] 		    = $this->language->get('column_action');
+			/* 25 10 2021 */
+		]]></add>
+	</operation> 
+</file>
+
+<file path="admin/language/*/catalog/product.php">    
+	<operation error="skip">
+		<search><![CDATA[// Text]]></search>
+		<add position="after"><![CDATA[
+		/* 25 10 2021 */
+			$_['entry_fromsqr']             = 'Cm From';
+			$_['entry_tosqr']          		= 'Cm To';
+			$_['entry_sqrprice']          	= 'Price';
+			$_['entry_discount']          	= 'Discount Value';
+			$_['tab_p_price']          		= 'Product Price';
+
+			$_['entry_sqr_width']          	= 'Width';
+			$_['entry_width_min']          	= 'Min';
+			$_['entry_width_max']          	= 'Max';
+			$_['entry_sqr_height']          = 'Height';
+			$_['entry_height_min']          = 'Min';
+			$_['entry_height_max']          = 'Max';
+			$_['entry_sqr_cm']              = 'Square Cm';
+
+			$_['column_from']               = 'Cm From';
+			$_['column_to']                 = 'Cm To';
+			$_['column_price']              = 'Price';
+			$_['column_quantity']           = 'Quantity';
+			$_['column_action']             = 'Action';
+		/* 25 10 2021 */
+		]]></add>
+	</operation> 				
+</file>
+
+<file path="admin/model/catalog/product.php"> 
+	<operation error="skip">
+		<search><![CDATA[if (isset($data['product_layout'])) {]]></search>
+	<add position="before"><![CDATA[
+/* 25 10 2021 */
+	$this->db->query("DELETE FROM " . DB_PREFIX . "product_price_setting WHERE product_id = '" . (int)$product_id . "'");
+	if (isset($data['width_min']) && isset($data['width_max']) && isset($data['height_min']) && isset($data['height_max'])) {
+		$this->db->query("INSERT INTO " . DB_PREFIX . "product_price_setting SET width_min = '" . $data['width_min'] . "',width_max = '" . $data['width_max'] . "',height_min = '" . $data['height_min'] . "',height_max = '" . $data['height_max'] . "',product_id = '" . (int)$product_id . "'");
+	}
+	$this->db->query("DELETE FROM " . DB_PREFIX . "product_prices WHERE product_id = '" . (int)$product_id . "'");
+	if (isset($data['product_price'])) {
+		foreach ($data['product_price'] as $product_price) {
+			$this->db->query("INSERT INTO " . DB_PREFIX . "product_prices SET product_id = '" . (int)$product_id . "',  from_sqr = '" . (int)$product_price['from_sqr'] . "', to_sqr = '" . (int)$product_price['to_sqr'] . "', price = '" . (float)$product_price['price'] . "', discount = '" . (float)$product_price['discount'] . "'");
+		}
+	}
+/* 25 10 2021 */
+	]]></add>
+	</operation> 
+	<operation error="skip">
+		<search><![CDATA[$data['product_recurrings'] = $this->getRecurrings($product_id);]]></search>
+		<add position="after"><![CDATA[
+		/* 25 10 2021 */
+			$data['product_price'] = $this->getProductPrices($product_id);
+		/* 25 10 2021 */
+		]]></add>
+	</operation>
+	<operation error="skip">
+		<search><![CDATA[public function deleteProduct($product_id) {]]></search>
+		<add position="after"><![CDATA[
+		/* 25 10 2021 */
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_price_setting WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_prices WHERE product_id = '" . (int)$product_id . "'");
+		/* 25 10 2021 */
+		]]></add>
+	</operation>
+	<operation error="skip">
+		<search><![CDATA[public function getProductSpecials($product_id) {]]></search>
+		<add position="before"><![CDATA[
+		/* 25 10 2021 */
+			public function getSqrSetting($product_id) {
+				$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_price_setting WHERE product_id = '" . (int)$product_id . "'");
+
+				return $query->row;
+			}
+			public function getProductPrices($product_id) {
+				$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_prices WHERE product_id = '" . (int)$product_id . "' order by  discount asc");
+
+				return $query->rows;
+			}
+		/* 25 10 2021 */
+		]]></add>
+	</operation> 				
+</file>
+
+<file path="admin/view/template/catalog/product_form.tpl">  
+
+	<operation error="skip">
+		<search><![CDATA[<li><a href="#tab-design" data-toggle="tab"><?php echo $tab_design; ?></a></li>]]></search>
+		<add position="before"><![CDATA[
+		<!-- 25 10 2021 -->
+            <li><a href="#tab-tmd_productdimension" data-toggle="tab"><?php echo $tab_p_price; ?></a></li>
+		<!-- 25 10 2021 -->
+		]]></add>
+	</operation> 
+	<operation error="skip">
+		<search><![CDATA[<div class="tab-pane" id="tab-design">]]></search>
+		<add position="before"><![CDATA[
+		<!-- 25 10 2021 -->
+            <div class="tab-pane" id="tab-tmd_productdimension">
+            	<div class="form-group">
+	                <label class="col-sm-2 control-label"><?php echo $entry_sqr_width; ?></label>
+	                <div class="row">
+	                  <div class="col-sm-4">
+	                    <div class="input-group">
+	                      <div class="input-group-addon"><?php echo $entry_width_min; ?></div>
+	                      <input type="number" name="width_min" value="<?php echo $width_min; ?>" placeholder="<?php echo $entry_width_min; ?>" class="form-control" />
+	                    </div>
+	                  </div>
+	                  <div class="col-sm-4">
+	                    <div class="input-group">
+	                      <div class="input-group-addon"><?php echo $entry_width_max; ?></div>
+	                      <input type="number" name="width_max" value="<?php echo $width_max; ?>" placeholder="<?php echo $entry_width_max; ?>" class="form-control" />
+	                    </div>
+	                  </div>
+	                </div>
+	            </div>
+
+	             <div class="form-group">
+	                <label class="col-sm-2 control-label"><?php echo $entry_sqr_height; ?></label>
+	                <div class="row">
+	                  <div class="col-sm-4">
+	                    <div class="input-group">
+	                      <div class="input-group-addon"><?php echo $entry_height_min; ?></div>
+	                      <input type="number" name="height_min" value="<?php echo $height_min; ?>" placeholder="<?php echo $entry_height_min; ?>" class="form-control" />
+	                    </div>
+	                  </div>
+	                  <div class="col-sm-4">
+	                    <div class="input-group">
+	                      <div class="input-group-addon"><?php echo $entry_height_max; ?></div>
+	                      <input type="number" name="height_max" value="<?php echo $height_max; ?>" placeholder="<?php echo $entry_height_max; ?>" class="form-control" />
+	                    </div>
+	                  </div>
+	                </div>
+	            </div>
+	            <div class="form-group">
+	                <label class="col-sm-2 control-label"><?php echo $entry_sqr_cm; ?></label>
+					<div class="col-sm-10">
+			            <div class="table-responsive">
+			              <table id="tmd_productdimension" class="table table-striped table-bordered table-hover">
+			                <thead>
+			                  <tr>
+			                    <td class="text-left"><?php echo $entry_fromsqr; ?></td>
+			                    <td class="text-left"><?php echo $entry_tosqr; ?></td>
+			                    <td class="text-left"><?php echo $entry_sqrprice; ?></td>
+			                    <td class="text-left"><?php echo $entry_discount; ?></td>
+			                    <td class="text-left"><?php echo $column_action; ?></td>
+			                  </tr>
+			                </thead>
+			                <tbody>
+
+			                <?php $tmd_productdimension_row = 0; ?>
+			                <?php foreach ($product_prices as $product_price) { ?>
+			                    <tr id="tmd_productdimension-row<?php echo $tmd_productdimension_row; ?>">
+			                     
+			                      <td class="text-left"><input type="text" name="product_price[<?php echo $tmd_productdimension_row; ?>][from_sqr]" value="<?php echo $product_price['from_sqr']; ?>" placeholder="<?php echo $entry_fromsqr ; ?>" class="form-control"/></td>
+			                      <td class="text-  "><input type="text" name="product_price[<?php echo $tmd_productdimension_row ; ?>][to_sqr]" value="<?php echo $product_price['to_sqr']; ?>" placeholder="<?php echo $entry_tosqr; ?>" class="form-control"/></td>
+			                      <td class="text-left"><input type="text" name="product_price[<?php echo $tmd_productdimension_row; ?>][price]" value="<?php echo $product_price['price']; ?>" placeholder="<?php echo $entry_sqrprice; ?>" class="form-control"/></td>
+			                      <td class="text-left">
+			                      	<div class="input-group">
+			                      		<div class="input-group-addon"><i class="fa fa-percent" aria-hidden="true"></i><b>%</b></div>
+			                      		<input type="text" name="product_price[<?php echo $tmd_productdimension_row; ?>][discount]" value="<?php echo $product_price['discount']; ?>" placeholder="<?php echo $entry_discount; ?>" class="form-control"/>
+			                      	</div>
+			                      </td>
+			                      <td class="text-left"><button type="button" onclick="$('#tmd_productdimension-row<?php echo $tmd_productdimension_row; ?>').remove();" data-toggle="tooltip" title="<?php echo $button_remove; ?>" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>
+			             
+			                    </tr>
+			                <?php $tmd_productdimension_row++; ?>
+                        	<?php } ?>
+			                </tbody>
+
+			                <tfoot>
+			                  <tr>
+			                    <td colspan="4"></td>
+			                    <td class="text-left"><button type="button" onclick="addtmd_productdimension();" data-toggle="tooltip" title="<?php echo $button_discount_add; ?>" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button></td>
+			                  </tr>
+			                </tfoot>
+			              </table>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+		<!-- 25 10 2021 -->
+		]]></add>
+	</operation>
+	<operation error="skip">
+		<search><![CDATA[<?php echo $footer; ?>]]></search>
+		<add position="before"><![CDATA[
+		<!-- 25 10 2021 -->
+            <script type="text/javascript"><!--
+			  var tmd_productdimension_row =<?php echo $tmd_productdimension_row; ?>;
+
+			  function addtmd_productdimension() {
+			    html = '<tr id="tmd_productdimension-row' + tmd_productdimension_row + '">';
+			    html += '  <td class="text-right"><input type="text" name="product_price[' + tmd_productdimension_row + '][from_sqr]" value="" placeholder="<?php echo $entry_fromsqr ; ?>" class="form-control" /></td>';
+			    html += '  <td class="text-right"><input type="text" name="product_price[' + tmd_productdimension_row + '][to_sqr]" value="" placeholder="<?php echo $entry_tosqr; ?>" class="form-control" /></td>';
+			    html += '  <td class="text-right"><input type="text" name="product_price[' + tmd_productdimension_row + '][price]" value="" placeholder="<?php echo $entry_sqrprice; ?>" class="form-control" /></td>';
+			    html += '  <td class="text-right"><div class="input-group"><div class="input-group-addon"><i class="fa fa-percent" aria-hidden="true"></i><b>%</b></div><input type="text" name="product_price[' + tmd_productdimension_row + '][discount]" value="" placeholder="<?php echo $entry_discount; ?>" class="form-control" /></div></td>';
+			    html += '  <td class="text-left"><button type="button" onclick="$(\'#tmd_productdimension-row' + tmd_productdimension_row + '\').remove();" data-toggle="tooltip" title="<?php echo $button_remove; ?>" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>';
+			    html += '</tr>';
+
+			    $('#tmd_productdimension tbody').append(html);
+
+			    tmd_productdimension_row++;
+			  }
+
+			  //--></script>
+		<!-- 25 10 2021 -->
+		]]></add>
+	</operation>
+</file>
+
+<file path="catalog/controller/product/product.php">   
+	<operation error="skip">
+		<search><![CDATA[if ($product_info) {]]></search>
+		<add position="before"><![CDATA[
+			/* 10 06 2020 */
+				if (isset($this->request->get['product_id'])) {
+					$data['tmd_product_id'] = $this->request->get['product_id'];
+				} else {
+					$data['tmd_product_id'] = 0;
+				}
+
+				if (isset($this->request->get['manufacturer_id'])) {
+					$data['tmd_manufacturer_id'] = $this->request->get['manufacturer_id'];
+				} else {
+					$data['tmd_manufacturer_id'] = 0;
+				}
+
+				if (isset($this->request->get['path'])) {
+					$path = '';
+					$parts = explode('_', (string)$this->request->get['path']);
+					$data['tmd_category_id'] = (int)array_pop($parts);
+				} else {
+					$data['tmd_category_id'] = 0;
+				}
+
+				$sqr_products = $this->config->get('tmd_productdimension_pproducts');
+				if(isset($sqr_products)) {
+					$data['sqr_products'] = $sqr_products;
+				} else {
+					$data['sqr_products']=array();
+				}
+
+				$sqr_manufacturers = $this->config->get('tmd_productdimension_manufacturer');
+				if(isset($sqr_manufacturers)) {
+					$data['sqr_manufacturers'] = $sqr_manufacturers;
+				} else {
+					$data['sqr_manufacturers']=array();
+				}
+				$sqr_categories = $this->config->get('tmd_productdimension_category');
+				if(isset($sqr_categories)) {
+					$data['sqr_categories'] = $sqr_categories;
+				} else {
+					$data['sqr_categories']=array();
+				}
+				$this->load->language('extension/tmd_productdimension');
+				
+				$status1 = $this->config->get('tmd_productdimension_status');
+				if(!empty($status1)){
+					$data['dispay']=true;
+				}else{
+					$data['dispay']=false;
+				}
+				
+				$data['tmd_productdimension'] = $this->load->controller('extension/tmd_productdimension');
+		/* 10 06 2020 */
+		]]></add>
+	</operation> 
+	<operation error="skip">
+		<search><![CDATA[$data['heading_title'] = $product_info['name'];]]></search>
+		<add position="after"><![CDATA[
+		/* 10 06 2020 */
+			$data['text_coption']    = $this->language->get('text_coption');
+		/* 10 06 2020 */
+		]]></add>
+	</operation> 
+</file>
+
+<file path="catalog/view/theme/*/template/product/product.tpl">   
+	<operation error="skip">
+		<search><![CDATA[<div id="product"><?php if ($options) { ?>]]></search>
+		<add position="replace"><![CDATA[
+		<!-- 10 06 2020 -->
+		<div id="product">
+		<?php if(!$options) { ?>
+
+		<?php if($dispay) { ?>
+		<div class="tmd_productdimensions"></div>
+		<?php echo $tmd_productdimension; ?>
+		<?php } ?>
+		<?php } ?>
+		<?php if($options) { ?>
+        <!-- 10 06 2020 end -->
+		]]></add>
+	</operation>
+
+	<operation error="skip">
+		<search><![CDATA[<h3><?php echo $text_option; ?></h3>]]></search>
+		<add position="after"><![CDATA[
+		<!-- 10 06 2020 -->
+		<?php if($options) { ?>
+
+		<?php if($dispay) { ?>
+		<div class="tmd_productdimensions"></div>
+		<?php echo $tmd_productdimension; ?>
+		<?php } ?>
+		<?php } ?>
+		<!-- 10 06 2020 end -->
+		]]></add>
+	</operation>
+		
+	<operation error="skip">
+		<search><![CDATA[if (json['error']['option']) {]]></search>
+		<add position="before"><![CDATA[
+		/* 10 06 2020 */
+		if (json['error']['sqr_height']) {
+          $('#input-sqrheight').after('<div class="text-danger">' + json['error']['sqr_height'] + '</div>');
+        }	
+        if (json['error']['sqr_width']) {
+          $('#input-sqrwidth').after('<div class="text-danger">' + json['error']['sqr_width'] + '</div>');
+        }
+      	if (json['error']['cus_price']) {
+           $('.tmdalert').after('<div class="alert alert-danger alert-dismissible warning">'+json['error']['cus_price']+'<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+        }
+		/* 10 06 2020 */
+		]]></add>
+	</operation>
+
+	<operation error="skip">
+		<search><![CDATA[<li><?php echo $text_tax; ?> <?php echo $tax; ?></li>]]></search>
+		<add position="replace"><![CDATA[
+		<li class="tax"><?php echo $text_tax; ?> <?php echo $tax; ?></li>
+		]]></add>
+	</operation>
+</file>
+
+<file path="catalog/view/theme/journal3/template/product/product.tpl">   
+	<operation error="skip">
+		<search index="0"><![CDATA[<?php if ($options): ?>]]></search>
+		<add position="before"><![CDATA[
+		<!-- 10 06 2020 -->
+		<div id="product" class="product-options">
+		<?php if (!$options): ?>
+
+		<?php if ($dispay): ?>
+		<div class="tmd_productdimensions"></div>
+		<?php echo $tmd_productdimension; ?>
+		<?php endif; ?>
+		<?php endif; ?>
+        <!-- 10 06 2020 end -->
+		]]></add>
+	</operation>
+
+	<operation error="skip">
+		<search><![CDATA[<h3 class="options-title title"><?php echo $text_option; ?></h3>]]></search>
+		<add position="before"><![CDATA[
+		<!-- 10 06 2020 -->
+		<?php if ($options): ?>
+		<?php if ($dispay): ?>
+		<div class="tmd_productdimensions"></div>
+		<?php echo $tmd_productdimension; ?>
+		<?php endif; ?>
+		<?php endif; ?>
+		<!-- 10 06 2020 end -->
+		]]></add>
+	</operation>
+
+	<operation error="skip">
+		<search><![CDATA[<i class="fa fa-angle-up"></i>]]></search>
+		<add position="replace"><![CDATA[
+		<!-- 30 11 2021 -->
+          <i class="fa fa-angle-up gohide"></i>
+		<!-- 30 11 2021 -->
+		]]></add>
+	</operation>
+
+	<operation error="skip">
+		<search><![CDATA[<i class="fa fa-angle-down"></i>]]></search>
+		<add position="replace"><![CDATA[
+		<!-- 30 11 2021 -->
+          <i class="fa fa-angle-down gohide"></i>
+		<!-- 30 11 2021 -->
+		]]></add>
+	</operation>
+</file>
+
+<file path="catalog/view/theme/journal2/template/product/product.tpl">   
+	<operation error="skip">
+		<search index="0"><![CDATA[<?php if ($options) { ?>]]></search>
+		<add position="before"><![CDATA[
+		<!-- 10 06 2020 -->
+		<div id="product" class="options>
+		<?php if(!$options) { ?>
+
+		<?php if($dispay) { ?>
+		<div class="tmd_productdimensions"></div>
+		<?php echo $tmd_productdimension; ?>
+		<?php } ?>
+		<?php } ?>
+        <!-- 10 06 2020 end -->
+		]]></add>
+	</operation>
+</file>
+
+<file path="system/library/cart/cart.php">
+	<operation error="skip">
+		<search><![CDATA[foreach (json_decode($cart['option']) as $product_option_id => $value) {]]></search>
+		<add position="after"><![CDATA[
+			/* 10 06 2020 */
+				$sqr_value='';
+				if($product_option_id=='sqr_price') {	
+					$product_query->row['price'] += $value;
+				}
+				if($product_option_id=='sqr_height' || $product_option_id=='sqr_width') {	
+					if($product_option_id=='sqr_height') {	
+						$sqr_value =$value;
+						$sqr_name ='Height';
+					}
+
+					if($product_option_id=='sqr_width') {	
+						$sqr_value =$value;
+						$sqr_name ='Width';
+					}
+			
+					$option_data[] = array(
+						'value'  => $sqr_value,
+						'name'  => $sqr_name,
+						'price'  => '',
+						'quantity'  => '',
+						'subtract'  => '',
+						'points'  => '',
+						'weight'  => '',
+						'price_prefix'  => '',
+						'points_prefix'  => '',
+						'weight_prefix'  => '',
+						'product_option_id'=> '',
+						'product_option_value_id'=> '',
+						'option_id'=> '',
+						'option_value_id'=> '',
+						'type'  => ''
+					);
+					if(isset($this->session->data['sqrprice'])) {
+						$product_query->row['price']=$this->session->data['sqrprice'];
+					} else {
+						$product_query->row['price']=0;
+					}
+				}
+			/* 10 06 2020 */
+		]]></add>
+	</operation>
+
+	<operation error="skip">
+		<search><![CDATA[$product_data[] = array(]]></search>
+		<add position="before"><![CDATA[
+	     if(isset($this->session->data['sqrprice'])) {
+			$price=$this->session->data['sqrprice'];
+		} else {
+			$price=$price;
+		}
+		]]></add>
+	</operation>
+
+	<operation error="skip">
+		<search><![CDATA[public function remove($cart_id) {]]></search>
+		<add position="after"><![CDATA[
+	     unset($this->session->data['sqrprice']);
+		]]></add>
+	</operation>
+
+	<operation error="skip">
+		<search><![CDATA[public function clear() {]]></search>
+		<add position="after"><![CDATA[
+	     unset($this->session->data['sqrprice']);
+		]]></add>
+	</operation>
+	
+</file>
+
+<file path="catalog/controller/checkout/cart.php">
+	<operation error="skip">
+		<search><![CDATA[if (!$json) {]]></search>
+		<add position="before"><![CDATA[
+			/* 10 06 2020 */
+			if (!empty($this->config->get('tmd_productdimension_status'))) {				
+
+				$tmdtext = $this->config->get('tmd_productdimension_multi');
+					
+				if(!empty($tmdtext[$this->config->get('config_language_id')]['errorwidth'])){
+					$data['error_width'] = $tmdtext[$this->config->get('config_language_id')]['errorwidth'];
+				} else {
+					$data['error_width'] = $this->language->get('error_width');
+				}
+
+				if(!empty($tmdtext[$this->config->get('config_language_id')]['errorheight'])){
+					$data['error_height'] = $tmdtext[$this->config->get('config_language_id')]['errorheight'];
+				} else {
+					$data['error_height'] = $this->language->get('error_height');
+				}
+
+				if(!empty($tmdtext[$this->config->get('config_language_id')]['erroroption'])){
+					$data['error_erroroption'] = $tmdtext[$this->config->get('config_language_id')]['erroroption'];
+				} else {
+					$data['error_erroroption'] = $this->language->get('error_erroroption');
+				}
+
+				if (isset($this->request->post['width'])) {
+					$width = $this->request->post['width'];
+				} else {
+					$width = 0;
+				}
+
+				if (isset($this->request->post['height'])) {
+					$height = $this->request->post['height'];
+				} else {
+					$height = 0;
+				}
+				$this->load->model('extension/tmd_productdimension');
+				$sqrpriceinfos = $this->model_extension_tmd_productdimension->getSqrPrices($product_id);
+				$infos = $this->model_extension_tmd_productdimension->getTmdProductPricestatus($product_id);
+				if($infos){	
+					$this->load->language('extension/tmd_productdimension');
+					if (empty($option['sqr_height'])) {
+						$json['error']['sqr_height'] = $data['error_height'];
+					}
+					if (empty($option['sqr_width'])) {
+						$json['error']['sqr_width'] = $data['error_width'];
+					}
+
+					if (empty($this->request->post['customoption']['cus_price'])) {
+						$json['error']['cus_price'] = $data['error_erroroption'];
+					}
+				} elseif ($sqrpriceinfos) {
+					$this->load->language('extension/tmd_productdimension');
+					if (empty($option['sqr_height'])) {
+						$json['error']['sqr_height'] = $data['error_height'];
+					}
+					if (empty($option['sqr_width'])) {
+						$json['error']['sqr_width'] = $data['error_width'];
+					}
+
+					if (empty($this->request->post['customoption']['cus_price'])) {
+						$json['error']['cus_price'] = $data['error_erroroption'];
+					}
+				}
+			}
+			/* 10 06 2020 */
+		]]></add>
+	</operation> 				
+</file>
+</modification>

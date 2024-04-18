@@ -1,0 +1,12 @@
+  $('#error-' + key.replaceAll('_', '-')).html(json['error'][key]).addClass('d-block');
+$('.alert-dismissible, .text-danger').remove();
+    if (json['error']['sqr_height']) {
+          $('#input-sqrheight').after('<div class="text-danger">' + json['error']['sqr_height'] + '</div>');
+        } 
+        if (json['error']['sqr_width']) {
+          $('#input-sqrwidth').after('<div class="text-danger">' + json['error']['sqr_width'] + '</div>');
+        }
+        if (json['error']['cus_price']) {
+           $('.tmdalert').after('<div class="alert alert-danger alert-dismissible warning">'+json['error']['cus_price']+'<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>');
+        }
+                   

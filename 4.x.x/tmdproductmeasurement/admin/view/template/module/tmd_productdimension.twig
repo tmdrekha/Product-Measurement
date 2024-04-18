@@ -1,0 +1,618 @@
+{{ header }}{{ column_left }}
+<div id="content">
+   <div class="page-header">
+    <div class="container-fluid">
+      <div class="float-end">
+        <button type="submit" form="form-tmd_productdimension" data-bs-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i></button>
+        <a href="{{ back }}" data-bs-toggle="tooltip" title="{{ button_back }}" class="btn btn-light"><i class="fa-solid fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ol class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+          <li class="breadcrumb-item"><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+  {{ getkeyform }}
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header"><i class="fa-solid fa-pencil"></i> {{ text_edit }}</div>
+      <div class="card-body">
+          <form id="form-tmd_productdimension" action="{{ save }}" method="post" data-oc-toggle="ajax">
+            <ul class="nav nav-tabs">
+            <li class="nav-item"><a href="#tab-general" data-bs-toggle="tab" class="nav-link active">{{ tab_general }}</a></li>
+            <li class="nav-item"><a href="#tab-link" data-bs-toggle="tab" class="nav-link">{{ tab_link }}</a></li>
+            <li class="nav-item"><a href="#tab-language" data-bs-toggle="tab" class="nav-link">{{ tab_language }}</a></li>
+           
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="tab-general">
+                   <div class="row mb-3">
+                  <label for="input-status" class="col-sm-2 col-form-label">{{ entry_status }}</label>
+                  <div class="col-sm-10">
+                    <div class="input-group">
+                      <div class="form-check form-switch form-switch-lg">
+                        <input type="hidden" name="module_tmd_productdimension_status" value="0"/>
+                        <input type="checkbox" name="module_tmd_productdimension_status" value="1" id="input-status" class="form-check-input"{% if module_tmd_productdimension_status %} checked{% endif %}/>
+                      </div>
+                      
+                    </div>
+                  </div>
+                </div>
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="input-h-color">{{ entry_headingcolor }}</label>
+                <div class="col-sm-6">
+                  <input type="text" name="module_tmd_productdimension_h_color" class="form-control color-picker" value="{{ module_tmd_productdimension_h_color }}">
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="input-text-color">{{ entry_textcolor }}</label>
+                <div class="col-sm-6">
+                  <input type="text" name="module_tmd_productdimension_h_textcolor" class="form-control color-picker" value="{{ module_tmd_productdimension_h_textcolor }}">
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_width }}</label>
+                
+                  <div class="col-sm-4">
+                    <div class="input-group">
+                      <div class="input-group-text">{{ entry_min }}</div>
+                      <input type="number" name="module_tmd_productdimension_width_min" value="{{ module_tmd_productdimension_width_min }}" placeholder="{{ entry_min }}" class="form-control" />
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="input-group">
+                      <div class="input-group-text">{{ entry_max }}</div>
+                      <input type="number" name="module_tmd_productdimension_width_max" value="{{ module_tmd_productdimension_width_max }}" placeholder="{{ entry_max }}" class="form-control" />
+                    </div>
+                  </div>
+               
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_height }}</label>
+                  <div class="col-sm-4">
+                    <div class="input-group">
+                      <div class="input-group-text">{{ entry_min }}</div>
+                      <input type="number" name="module_tmd_productdimension_height_min" value="{{ module_tmd_productdimension_height_min }}" placeholder="{{ entry_min }}" class="form-control" />
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="input-group">
+                      <div class="input-group-text">{{ entry_max }}</div>
+                      <input type="number" name="module_tmd_productdimension_height_max" value="{{ module_tmd_productdimension_height_max }}" placeholder="{{ entry_max }}" class="form-control" />
+                    </div>
+                  </div>
+              </div>
+
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label" for="input-sqrprice">{{ entry_sqrprice }}</label>
+                <div class="col-sm-10">
+                  <div class="table-responsive">
+                    <table id="tmddiscount" class="table table-striped table-bordered table-hover">
+                      <thead>
+                        <tr>
+                          <td class="text-left">{{ column_from }}</td>
+                          <td class="text-left">{{ column_to }}</td>
+                          <td class="text-left">{{ column_price }}</td>
+                          <td class="text-left">{{ entry_discount }}</td>
+                          <td class="text-center">{{ entry_action }}</td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% set price_row = 0 %}
+                        {% for tmd_productdimension_productsqr in tmd_productdimension_product_sqrs %}
+                        <tr id="price-row{{ price_row }}">
+                          <td class="text-right"><input type="number" name="module_tmd_productdimension_productsqr[{{ price_row }}][from_sqr]" value="{{ tmd_productdimension_productsqr.from_sqr }}" placeholder="{{ entry_from }}" class="form-control"/></td>
+                          <td class="text-right"><input type="number" name="module_tmd_productdimension_productsqr[{{ price_row }}][to_sqr]" value="{{ tmd_productdimension_productsqr.to_sqr }}" placeholder="{{ entry_to }}" class="form-control"/></td>
+                          <td class="text-right"><input type="text" name="module_tmd_productdimension_productsqr[{{ price_row }}][price]" value="{{ tmd_productdimension_productsqr.price }}" placeholder="{{ entry_price }}" class="form-control"/></td>
+                          <td class="text-right">
+                            <div class="input-group">
+                              <div class="input-group-text"><i class="fa fa-percent" aria-hidden="true"></i></div>
+                              <input type="number" name="module_tmd_productdimension_productsqr[{{ price_row }}][discount]" value="{{ tmd_productdimension_productsqr.discount }}" placeholder="{{ entry_discount }}" class="form-control"/>
+                            </div>
+                          </td>
+                          <td class="text-center"><button type="button" onclick="$('#price-row{{ price_row }}').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>
+                        </tr>
+                        {% set price_row = price_row + 1 %}
+                        {% endfor %}
+                      </tbody>
+
+                      <tfoot>
+                        <tr>
+                          <td colspan="4"></td>
+                          <td class="text-center"><button type="button" onclick="addPrice();" data-toggle="tooltip" title="{{ button_discount_add }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-pane" id="tab-link">
+              {% if(VERSION>='4.0.2.0') %}
+                <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_product }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="tmdproducts" value="" placeholder="{{ entry_product }}" id="input-tmdproducts" data-oc-target="autocomplete-tmdproducts" class="form-control" autocomplete="off"/>
+                  <ul id="autocomplete-tmdproducts" class="dropdown-menu"></ul>
+                  <div class="input-group">
+                    <div class="form-control p-0" style="height: 150px; overflow: auto;">
+                      <table id="book-product" class="table table-sm m-0">
+                        <tbody>
+                          {% for product in tmd_productdimension_products %}
+                            <tr id="book-product-{{ product.product_id }}">
+                              <td>{{ product.name }}<input type="hidden" name="module_tmd_productdimension_pproducts[]" value="{{ product.product_id }}"/></td>
+                              <td class="text-end"><button type="button" class="btn btn-danger btn-sm"><i class="fa-solid fa-minus-circle"></i></button></td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% else %}
+               <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_product }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="tmdproducts" value="" placeholder="{{ entry_product }}" id="input-tmdproducts" list="list-tmdproducts" class="form-control"/>
+                  <datalist id="list-tmdproducts"></datalist>
+                  <div class="input-group">
+                    <div class="form-control p-0" style="height: 150px; overflow: auto;">
+                      <table id="book-product" class="table table-sm m-0">
+                        <tbody>
+                          {% for product in tmd_productdimension_products %}
+                            <tr id="book-product-{{ product.product_id }}">
+                              <td>{{ product.name }}<input type="hidden" name="module_tmd_productdimension_pproducts[]" value="{{ product.product_id }}"/></td>
+                              <td class="text-end"><button type="button" class="btn btn-danger btn-sm"><i class="fa-solid fa-minus-circle"></i></button></td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+
+                {% if(VERSION>='4.0.2.0') %}
+                 <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_category }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="category" value="" placeholder="{{ entry_category }}" id="input-category" data-oc-target="autocomplete-category" class="form-control"/>
+               <ul id="autocomplete-category" class="dropdown-menu"></ul>
+                  <div class="input-group">
+                    <div class="form-control p-0" style="height: 150px; overflow: auto;">
+                      <table id="tmdscategory" class="table table-sm m-0">
+                        <tbody>
+                          {% for tmd_productdimension_category in tmd_productdimension_categories %}
+                            <tr id="tmdscategory-{{ tmd_productdimension_category.category_id }}">
+                              <td>{{ tmd_productdimension_category.name }}<input type="hidden" name="module_tmd_productdimension_category[]" value="{{ tmd_productdimension_category.category_id }}"/></td>
+                              <td class="text-end"><button type="button" class="btn btn-danger btn-sm"><i class="fa-solid fa-minus-circle"></i></button></td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% else %}
+                <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_category }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="category" value="" placeholder="{{ entry_category }}" id="input-category" list="list-category" class="form-control"/>
+                  <datalist id="list-category"></datalist>
+                  <div class="input-group">
+                    <div class="form-control p-0" style="height: 150px; overflow: auto;">
+                      <table id="tmdscategory" class="table table-sm m-0">
+                        <tbody>
+                          {% for tmd_productdimension_category in tmd_productdimension_categories %}
+                            <tr id="tmdscategory-{{ tmd_productdimension_category.category_id }}">
+                              <td>{{ tmd_productdimension_category.name }}<input type="hidden" name="module_tmd_productdimension_category[]" value="{{ tmd_productdimension_category.category_id }}"/></td>
+                              <td class="text-end"><button type="button" class="btn btn-danger btn-sm"><i class="fa-solid fa-minus-circle"></i></button></td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+
+            {% if(VERSION>='4.0.2.0') %}
+               <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_manufacturer }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="manufacturer" value="" placeholder="{{ entry_manufacturer }}" id="input-manufacturer" data-oc-target="autocomplete-manufacturer" class="form-control"/>
+                  <ul id="autocomplete-manufacturer" class="dropdown-menu"></ul>
+                  <div class="input-group">
+                    <div class="form-control p-0" style="height: 150px; overflow: auto;">
+                      <table id="tmdsmanufacturer" class="table table-sm m-0">
+                        <tbody>
+                          {% for tmd_productdimension_manufacturer in tmd_productdimension_manufacturers %}
+                            <tr id="tmdsmanufacturer-{{ tmd_productdimension_manufacturer.manufacturer_id }}">
+                              <td>{{ tmd_productdimension_manufacturer.name }}<input type="hidden" name="module_tmd_productdimension_manufacturer[]" value="{{ tmd_productdimension_manufacturer.manufacturer_id }}"/></td>
+                              <td class="text-end"><button type="button" class="btn btn-danger btn-sm"><i class="fa-solid fa-minus-circle"></i></button></td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% else %}
+             <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_manufacturer }}</label>
+                <div class="col-sm-10">
+                  <input type="text" name="manufacturer" value="" placeholder="{{ entry_manufacturer }}" id="input-manufacturer" list="list-manufacturer" class="form-control"/>
+                  <datalist id="list-manufacturer"></datalist>
+                  <div class="input-group">
+                    <div class="form-control p-0" style="height: 150px; overflow: auto;">
+                      <table id="tmdsmanufacturer" class="table table-sm m-0">
+                        <tbody>
+                          {% for tmd_productdimension_manufacturer in tmd_productdimension_manufacturers %}
+                            <tr id="tmdsmanufacturer-{{ tmd_productdimension_manufacturer.manufacturer_id }}">
+                              <td>{{ tmd_productdimension_manufacturer.name }}<input type="hidden" name="module_tmd_productdimension_manufacturer[]" value="{{ tmd_productdimension_manufacturer.manufacturer_id }}"/></td>
+                              <td class="text-end"><button type="button" class="btn btn-danger btn-sm"><i class="fa-solid fa-minus-circle"></i></button></td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+
+
+
+
+            <div class="tab-pane" id="tab-language">
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_total }}</label>
+                <div class="col-sm-10">
+                  {% for language in languages %}
+                  <div class="input-group"><span class="input-group-text"><img src="{{ language.image }}" title="{{ language.name }}" /></span>
+                    <input type="text" name="module_tmd_productdimension_multi[{{ language.language_id }}][totaltext]" value="{{ module_tmd_productdimension_multi[language.language_id] ? module_tmd_productdimension_multi[language.language_id].totaltext }}" placeholder="{{ entry_total }}" class="form-control" />
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_discounttext }}</label>
+                <div class="col-sm-10">
+                  {% for language in languages %}
+                  <div class="input-group"><span class="input-group-text"><img src="{{ language.image }}" title="{{ language.name }}" /></span>
+                    <input type="text" name="module_tmd_productdimension_multi[{{ language.language_id }}][discounttext]" value="{{ module_tmd_productdimension_multi[language.language_id] ? module_tmd_productdimension_multi[language.language_id].discounttext }}" placeholder="{{ entry_discounttext }}" class="form-control" />
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_heading }}</label>
+                <div class="col-sm-10">
+                  {% for language in languages %}
+                  <div class="input-group"><span class="input-group-text"><img src="{{ language.image }}" title="{{ language.name }}" /></span>
+                    <input type="text" name="module_tmd_productdimension_multi[{{ language.language_id }}][headingtext]" value="{{ module_tmd_productdimension_multi[language.language_id] ? module_tmd_productdimension_multi[language.language_id].headingtext }}" placeholder="{{ entry_heading }}" class="form-control" />
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_choosebox }}</label>
+                <div class="col-sm-10">
+                  {% for language in languages %}
+                  <div class="input-group"><span class="input-group-text"><img src="{{ language.image }}" title="{{ language.name }}" /></span>
+                    <input type="text" name="module_tmd_productdimension_multi[{{ language.language_id }}][choosebox]" value="{{ module_tmd_productdimension_multi[language.language_id] ? module_tmd_productdimension_multi[language.language_id].choosebox }}" placeholder="{{ entry_choosebox }}" class="form-control" />
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_quantity }}</label>
+                <div class="col-sm-10">
+                  {% for language in languages %}
+                  <div class="input-group"><span class="input-group-text"><img src="{{ language.image }}" title="{{ language.name }}" /></span>
+                    <input type="text" name="module_tmd_productdimension_multi[{{ language.language_id }}][quantity]" value="{{ module_tmd_productdimension_multi[language.language_id] ? module_tmd_productdimension_multi[language.language_id].quantity }}" placeholder="{{ entry_quantity }}" class="form-control" />
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_price }}</label>
+                <div class="col-sm-10">
+                  {% for language in languages %}
+                  <div class="input-group"><span class="input-group-text"><img src="{{ language.image }}" title="{{ language.name }}" /></span>
+                    <input type="text" name="module_tmd_productdimension_multi[{{ language.language_id }}][price]" value="{{ module_tmd_productdimension_multi[language.language_id] ? module_tmd_productdimension_multi[language.language_id].price }}" placeholder="{{ entry_price }}" class="form-control" />
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_placeholder }}</label>
+                  <div class="col-sm-10">
+                    <div class="row">
+                    {% for language in languages %}
+                    <div class="col-sm-5">
+                      <div class="input-group">
+                        <span class="input-group-text"><img src="{{ language.image }}" title="{{ language.name }}" /></span>
+                        <input type="text" name="module_tmd_productdimension_multi[{{ language.language_id }}][width]" value="{{ module_tmd_productdimension_multi[language.language_id] ? module_tmd_productdimension_multi[language.language_id].width }}" placeholder="{{ entry_width }}" class="form-control" />
+                        <div class="input-group-text">{{ entry_width }}</div>
+                      </div>
+                    </div>
+                    <div class="col-sm-5">
+                      <div class="input-group">
+                        <span class="input-group-text"><img src="{{ language.image }}" title="{{ language.name }}" /></span>
+                        <input type="text" name="module_tmd_productdimension_multi[{{ language.language_id }}][height]" value="{{ module_tmd_productdimension_multi[language.language_id] ? module_tmd_productdimension_multi[language.language_id].height }}" placeholder="{{ entry_height }}" class="form-control" />
+                        <div class="input-group-text">{{ entry_height }}</div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_error_d }}</label>
+                <div class="col-sm-10">
+                    <div class="row">
+                    {% for language in languages %}
+                    <div class="col-sm-5">
+                      <div class="input-group">
+                        <span class="input-group-text"><img src="{{ language.image }}" title="{{ language.name }}" /></span>
+                        <input type="text" name="module_tmd_productdimension_multi[{{ language.language_id }}][errorwidth]" value="{{ module_tmd_productdimension_multi[language.language_id] ? module_tmd_productdimension_multi[language.language_id].errorwidth }}" placeholder="{{ entry_errorwidth }}" class="form-control" />
+                        <div class="input-group-text">{{ entry_errorwidth }}</div>
+                      </div>
+                    </div>
+                    <div class="col-sm-5">
+                      <div class="input-group">
+                        <span class="input-group-text"><img src="{{ language.image }}" title="{{ language.name }}" /></span>
+                        <input type="text" name="module_tmd_productdimension_multi[{{ language.language_id }}][errorheight]" value="{{ module_tmd_productdimension_multi[language.language_id] ? module_tmd_productdimension_multi[language.language_id].errorheight }}" placeholder="{{ entry_errorheight }}" class="form-control" />
+                        <div class="input-group-text">{{ entry_errorheight }}</div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_errorlimit }}</label>
+                  <div class="col-sm-10">
+                    <div class="row">
+                    {% for language in languages %}
+                    <div class="col-sm-5">
+                      <div class="input-group">
+                        <span class="input-group-text"><img src="{{ language.image }}" title="{{ language.name }}" /></span>
+                        <input type="text" name="module_tmd_productdimension_multi[{{ language.language_id }}][errorlimitwidth]" value="{{ module_tmd_productdimension_multi[language.language_id] ? module_tmd_productdimension_multi[language.language_id].errorlimitwidth }}" placeholder="{{ entry_width }}" class="form-control" />
+                        <div class="input-group-text">{{ entry_width }}</div>
+                      </div>
+                    </div>
+                    <div class="col-sm-5">
+                      <div class="input-group">
+                        <span class="input-group-text"><img src="{{ language.image }}" title="{{ language.name }}" /></span>
+                        <input type="text" name="module_tmd_productdimension_multi[{{ language.language_id }}][errorlimitheight]" value="{{ module_tmd_productdimension_multi[language.language_id] ? module_tmd_productdimension_multi[language.language_id].errorlimitheight }}" placeholder="{{ entry_height }}" class="form-control" />
+                        <div class="input-group-text">{{ entry_height }}</div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_errornot }}</label>
+                <div class="col-sm-10">
+                  {% for language in languages %}
+                  <div class="input-group"><span class="input-group-text"><img src="{{ language.image }}" title="{{ language.name }}" /></span>
+                    <input type="text" name="module_tmd_productdimension_multi[{{ language.language_id }}][not_faund]" value="{{ module_tmd_productdimension_multi[language.language_id] ? module_tmd_productdimension_multi[language.language_id].not_faund }}" placeholder="{{ entry_errornot }}" class="form-control" />
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ entry_erroroption }}</label>
+                <div class="col-sm-10">
+                  {% for language in languages %}
+                  <div class="input-group"><span class="input-group-text"><img src="{{ language.image }}" title="{{ language.name }}" /></span>
+                    <input type="text" name="module_tmd_productdimension_multi[{{ language.language_id }}][erroroption]" value="{{ module_tmd_productdimension_multi[language.language_id] ? module_tmd_productdimension_multi[language.language_id].erroroption }}" placeholder="{{ entry_erroroption }}" class="form-control" />
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+        </div>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="{{ HTTP_CATALOG }}extension/tmdproductmeasurement/admin/view/javascript/colorbox/jquery.minicolors.js"></script>
+<link rel="stylesheet" href="{{ HTTP_CATALOG }}extension/tmdproductmeasurement/admin/view/stylesheet/jquery.minicolors.css">
+<script>
+  $(document).ready( function() {
+    $('.color-picker').each(function() {
+      $(this).minicolors({
+        control: $(this).attr('data-control') || 'hue',
+        defaultValue: $(this).attr('data-defaultValue') || '',
+        inline: $(this).attr('data-inline') === 'true',
+        letterCase: $(this).attr('data-letterCase') || 'lowercase',
+        opacity: $(this).attr('data-opacity'),
+        position: $(this).attr('data-position') || 'bottom left',
+        change: function(hex, opacity) {
+          if( !hex ) return;
+          if( opacity ) hex += ', ' + opacity;
+          try {
+            console.log(hex);
+          } catch(e) {}
+        },
+        theme: 'bootstrap'
+      });
+    });
+  });
+</script>
+
+<script type="text/javascript">
+  var price_row = {{ price_row }};
+  function addPrice() {
+    html = '<tr id="price-row' + price_row + '">';
+    html += '  <td class="text-right"><input type="number" name="module_tmd_productdimension_productsqr[' + price_row + '][from_sqr]" value="" placeholder="{{ entry_from }}" class="form-control" /></td>';
+    html += '  <td class="text-right"><input type="number" name="module_tmd_productdimension_productsqr[' + price_row + '][to_sqr]" value="" placeholder="{{ entry_to }}" class="form-control" /></td>';
+    html += '  <td class="text-right"><input type="text" name="module_tmd_productdimension_productsqr[' + price_row + '][price]" value="" placeholder="{{ entry_price }}" class="form-control" /></td>';
+    html += '  <td class="text-right"><div class="input-group"><div class="input-group-text"><i class="fa fa-percent" aria-hidden="true"></i></div><input type="number" name="module_tmd_productdimension_productsqr[' + price_row + '][discount]" value="" placeholder="{{ entry_discount }}" class="form-control" /></div></td>';
+    html += '  <td class="text-left"><button type="button" onclick="$(\'#price-row' + price_row + '\').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>';
+    html += '</tr>';
+    $('#tmddiscount tbody').append(html);
+    price_row++;
+  }
+</script>
+
+<script>
+// product
+$('#input-tmdproducts').autocomplete({
+    'source': function (request, response) {
+        $.ajax({
+          {% if(VERSION>='4.0.2.0') %}
+            url: 'index.php?route=catalog/product.autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+          {% else %}
+            url: 'index.php?route=catalog/product|autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+            {% endif %}
+            dataType: 'json',
+            success: function (json) {
+                response($.map(json, function (item) {
+                    return {
+                        label: item['name'],
+                        value: item['product_id']
+                    }
+                }));
+            }
+        });
+    },
+    'select': function (item) {
+        $('#input-tmdproducts').val('');
+
+        $('#book-product-' + item['value']).remove();
+
+        html = '<tr id="book-product-' + item['value'] + '">';
+        html += '  <td>' + item['label'] + '<input type="hidden" name="module_tmd_productdimension_pproducts[]" value="' + item['value'] + '"/></td>';
+        html += '  <td class="text-end"><button type="button" class="btn btn-danger btn-sm"><i class="fa-solid fa-minus-circle"></i></button></td>';
+        html += '</tr>';
+
+        $('#book-product tbody').append(html);
+    }
+});
+
+$('#book-product').on('click', '.btn', function () {
+    $(this).parent().parent().remove();
+});
+
+/// Categories
+$('#input-category').autocomplete({
+    'source': function (request, response) {
+        $.ajax({
+          {% if(VERSION>='4.0.2.0') %}
+            url: 'index.php?route=catalog/category.autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+            
+            {% else %}
+            url: 'index.php?route=catalog/category|autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+            {% endif %}
+            dataType: 'json',
+            success: function (json) {
+                response($.map(json, function (item) {
+                    return {
+                        label: item['name'],
+                        value: item['category_id']
+                    }
+                }));
+            }
+        });
+    },
+    'select': function (item) {
+        $('#input-category').val('');
+
+        $('#tmdscategory-' + item['value']).remove();
+
+        html = '<tr id="tmdscategory-' + item['value'] + '">';
+        html += '  <td>' + item['label'] + '<input type="hidden" name="module_tmd_productdimension_category[]" value="' + item['value'] + '"/></td>';
+        html += '  <td class="text-end"><button type="button" class="btn btn-danger btn-sm"><i class="fa-solid fa-minus-circle"></i></button></td>';
+        html += '</tr>';
+
+        $('#tmdscategory tbody').append(html);
+    }
+});
+
+$('#tmdscategory').on('click', '.btn', function () {
+    $(this).parent().parent().remove();
+});
+
+
+/// Manufacturer
+
+$('#input-manufacturer').autocomplete({
+    'source': function (request, response) {
+        $.ajax({
+          {% if(VERSION>='4.0.2.0') %}
+            url: 'index.php?route=catalog/manufacturer.autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+          {% else %}
+            url: 'index.php?route=catalog/manufacturer|autocomplete&user_token={{ user_token }}&filter_name=' + encodeURIComponent(request),
+            {% endif %}
+            dataType: 'json',
+            success: function (json) {
+                response($.map(json, function (item) {
+                    return {
+                        label: item['name'],
+                        value: item['manufacturer_id']
+                    }
+                }));
+            }
+        });
+    },
+    'select': function (item) {
+        $('#input-manufacturer').val('');
+
+        $('#tmdsmanufacturer-' + item['value']).remove();
+
+        html = '<tr id="tmdsmanufacturer-' + item['value'] + '">';
+        html += '  <td>' + item['label'] + '<input type="hidden" name="module_tmd_productdimension_manufacturer[]" value="' + item['value'] + '"/></td>';
+        html += '  <td class="text-end"><button type="button" class="btn btn-danger btn-sm"><i class="fa-solid fa-minus-circle"></i></button></td>';
+        html += '</tr>';
+
+        $('#tmdsmanufacturer tbody').append(html);
+    }
+});
+
+$('#tmdsmanufacturer').on('click', '.btn', function () {
+    $(this).parent().parent().remove();
+});
+
+</script>
+<style>
+.input-group{
+  margin-bottom:10px;
+}
+#tmdtimes label{
+  margin-bottom:10px;
+}
+</style>
+{{ footer }} 
+

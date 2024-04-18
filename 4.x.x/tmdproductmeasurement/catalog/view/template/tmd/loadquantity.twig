@@ -1,0 +1,37 @@
+<div class="form-group">
+  {% if sqr_quantitys %}
+  <div class="table-responsive" id="input-qnty">
+    <table class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <td class="text-center bgc1"><b>{{ text_checked }}</b></td>
+          <td class="text-center bgc1"><b>{{ text_qty }}</b></td>
+          <td class="text-center bgc1"><b>{{ text_price }}</b></td>
+        </tr>
+      </thead>
+      <tbody>
+       {% for sqr_quantity in sqr_quantitys %}
+        <tr>
+          <td class="text-center">
+            <input type="hidden" name="prices"  value="{{ sqr_quantity.sub }}" class="sqrqunty_rad{{ sqr_quantity.key_id }}" />
+            <input type="radio" name="customoption[cus_price]"  value="{{ sqr_quantity.price1 }}" rel="{{ sqr_quantity.price1 }}" rel1="{{ sqr_quantity.quantity }}" data-key-id="{{ sqr_quantity.key_id }}" class="sqrqunty_rad" />
+          </td>
+          <td class="text-center">{{ sqr_quantity.quantity }}</td>
+          <td class="text-right">
+            {{ sqr_quantity.price }}
+          </td>
+        </tr>
+        {% endfor %}
+        <input type="hidden" name="option[sqr_qty]" class="sqr_qty" value="" />
+        <input type="hidden" name="option[sqr_price]" class="sqr_price" value=""/>
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="alert alert-danger alert-dismissible">{{ error }}</div>
+{% endif %}
+</div>
+<div class="tmdalert"></div>
+<style>
+.bgc1{background: {{ tmd_productdimension_h_color }}!important;color: {{ tmd_productdimension_h_textcolor }}!important;padding: 12px;}
+</style>

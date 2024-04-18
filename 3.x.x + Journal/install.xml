@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+	<name>Tmd Product Measurement</name>
+	<id>Tmd Product Measurement</id>
+	<version>1.0</version>
+	<code>#LC</code>
+	<author>TMD(opencartextensions.in)</author>
+	<link>http://opencartextensions.in/</link>
+	
+<file path="admin/controller/common/column_left.php">    
+	<operation error="skip">
+		<search><![CDATA[$this->load->language('common/column_left');]]></search>
+		<add position="after"><![CDATA[
+		$this->load->language('extension/module/tmd_productdimension_language');
+		]]></add>
+	</operation> 				
+	<operation error="skip">
+		<search><![CDATA[// Catalog]]></search>
+		<add position="before"><![CDATA[
+		/* 25 10 2020 */
+		    $productdimension_status = $this->config->get('module_tmd_productdimension_status');
+		    if(!empty($productdimension_status)){
+			if ($this->user->hasPermission('access', 'extension/module/tmd_productdimension')) {		
+				$data['menus'][] = array(
+					'id'       => 'menu-dashboard',
+					'icon'	   => 'fa-cogs',
+					'name'	   => $this->language->get('text_productdimension'),
+					'href'     => $this->url->link('extension/module/tmd_productdimension', 'user_token=' . $this->session->data['user_token'], true),
+					'children' => array()
+				);		
+			 }
+			}
+		/* 25 10 2020 */
+		]]></add>
+	</operation> 				
+</file>
+<file path="admin/controller/catalog/product.php"> 
+	<operation error="skip">
+		<search><![CDATA[protected function getForm() {]]></search>
+		<add position="after"><![CDATA[
+           $this->load->language('extension/module/tmd_productdimension_language');
+		]]></add>
+	</operation> 
+	<operation error="skip">
+		<search><![CDATA[if (isset($this->request->post['product_layout'])) {]]></search>
+		<add position="before"><![CDATA[
+    $data['productdimension_status'] = $this->config->get('module_tmd_productdimension_status');
+    if(!empty($data['productdimension_status'])){
+    $this->load->model('extension/tmdproductdimension');
+	$setting_info = $this->model_extension_tmdproductdimension->getSqrSetting($this->request->get['product_id']);
+
+				if (isset($this->request->post['width_min'])) {
+					$data['width_min'] = $this->request->post['width_min'];
+				} elseif (!empty($setting_info)) {
+					$data['width_min'] = $setting_info['width_min'];
+				} else {
+					$data['width_min'] = '';
+				}
+
+				if (isset($this->request->post['width_max'])) {
+					$data['width_max'] = $this->request->post['width_max'];
+				} elseif (!empty($setting_info)) {
+					$data['width_max'] = $setting_info['width_max'];
+				} else {
+					$data['width_max'] = '';
+				}
+
+				if (isset($this->request->post['height_min'])) {
+					$data['height_min'] = $this->request->post['height_min'];
+				} elseif (!empty($setting_info)) {
+					$data['height_min'] = $setting_info['height_min'];
+				} else {
+					$data['height_min'] = '';
+				}
+
+				if (isset($this->request->post['height_max'])) {
+					$data['height_max'] = $this->request->post['height_max'];
+				} elseif (!empty($setting_info)) {
+					$data['height_max'] = $setting_info['height_max'];
+				} else {
+					$data['height_max'] = '';
+				}
+                
+                 $this->load->model('extension/tmdproductdimension');
+				if (isset($this->request->post['product_price'])) {
+					$product_prices = $this->request->post['product_price'];
+				} elseif (isset($this->request->get['product_id'])) {
+					$product_prices = $this->model_extension_tmdproductdimension->getProductPrices($this->request->get['product_id']);
+				} else {
+					$product_prices = array();
+				}
+
+				$data['product_prices'] = array();
+
+				foreach ($product_prices as $product_price) {
+					$data['product_prices'][] = array(
+						'from_sqr'  => $product_price['from_sqr'],
+						'to_sqr'    => $product_price['to_sqr'],
+						'price'		=> $product_price['price'],
+						'discount'	=> $product_price['discount']
+					);
+				}
+
+			  }
+		]]></add>
+	</operation> 
+</file>
+
+<file path="admin/model/catalog/product.php"> 
+	<operation error="skip">
+		<search><![CDATA[if (isset($data['product_layout'])) {]]></search>
+	<add position="before"><![CDATA[
+/* 25 10 2021 */
+	$this->db->query("DELETE FROM " . DB_PREFIX . "product_price_setting WHERE product_id = '" . (int)$product_id . "'");
+	if (isset($data['width_min']) && isset($data['width_max']) && isset($data['height_min']) && isset($data['height_max'])) {
+		$this->db->query("INSERT INTO " . DB_PREFIX . "product_price_setting SET width_min = '" . $data['width_min'] . "',width_max = '" . $data['width_max'] . "',height_min = '" . $data['height_min'] . "',height_max = '" . $data['height_max'] . "',product_id = '" . (int)$product_id . "'");
+	}
+	$this->db->query("DELETE FROM " . DB_PREFIX . "product_prices WHERE product_id = '" . (int)$product_id . "'");
+	if (isset($data['product_price'])) {
+		foreach ($data['product_price'] as $product_price) {
+			$this->db->query("INSERT INTO " . DB_PREFIX . "product_prices SET product_id = '" . (int)$product_id . "',  from_sqr = '" . (int)$product_price['from_sqr'] . "', to_sqr = '" . (int)$product_price['to_sqr'] . "', price = '" . (float)$product_price['price'] . "', discount = '" . (float)$product_price['discount'] . "'");
+		}
+	}
+/* 25 10 2021 */
+	]]></add>
+	</operation> 
+	<operation error="skip">
+		<search><![CDATA[$data['product_recurrings'] = $this->getRecurrings($product_id);]]></search>
+		<add position="after"><![CDATA[
+		/* 25 10 2021 */
+		    $this->load->model('extension/tmdproductdimension');
+			$data['product_price'] = $this->model_extension_tmdproductdimension->getProductPrices($product_id);
+		/* 25 10 2021 */
+		]]></add>
+	</operation>
+	<operation error="skip">
+		<search><![CDATA[public function deleteProduct($product_id) {]]></search>
+		<add position="after"><![CDATA[
+		/* 25 10 2021 */
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_price_setting WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_prices WHERE product_id = '" . (int)$product_id . "'");
+		/* 25 10 2021 */
+		]]></add>
+	</operation>
+</file>
+
+<file path="admin/view/template/catalog/product_form.twig">  
+	<operation error="skip">
+		<search><![CDATA[<li><a href="#tab-design" data-toggle="tab">{{ tab_design }}</a></li>]]></search>
+		<add position="before"><![CDATA[
+		    {% if productdimension_status %}
+            <li><a href="#tab-tmd_productdimension" data-toggle="tab">{{ tab_p_price }}</a></li>
+		    {% endif %}
+		]]></add>
+	</operation> 
+	<operation error="skip">
+		<search><![CDATA[<div class="tab-pane" id="tab-design">]]></search>
+		<add position="before"><![CDATA[
+		{% if productdimension_status %}
+            <div class="tab-pane" id="tab-tmd_productdimension">
+            	<div class="form-group">
+	                <label class="col-sm-2 control-label">{{ entry_sqr_width }}</label>
+	                <div class="row">
+	                  <div class="col-sm-4">
+	                    <div class="input-group">
+	                      <div class="input-group-addon">{{ entry_width_min }}</div>
+	                      <input type="number" name="width_min" value="{{ width_min }}" placeholder="{{ entry_width_min }}" class="form-control" />
+	                    </div>
+	                  </div>
+	                  <div class="col-sm-4">
+	                    <div class="input-group">
+	                      <div class="input-group-addon">{{ entry_width_max }}</div>
+	                      <input type="number" name="width_max" value="{{ width_max }}" placeholder="{{ entry_width_max }}" class="form-control" />
+	                    </div>
+	                  </div>
+	                </div>
+	            </div>
+
+	             <div class="form-group">
+	                <label class="col-sm-2 control-label">{{ entry_sqr_height }}</label>
+	                <div class="row">
+	                  <div class="col-sm-4">
+	                    <div class="input-group">
+	                      <div class="input-group-addon">{{ entry_height_min }}</div>
+	                      <input type="number" name="height_min" value="{{ height_min }}" placeholder="{{ entry_height_min }}" class="form-control" />
+	                    </div>
+	                  </div>
+	                  <div class="col-sm-4">
+	                    <div class="input-group">
+	                      <div class="input-group-addon">{{ entry_height_max }}</div>
+	                      <input type="number" name="height_max" value="{{ height_max }}" placeholder="{{ entry_height_max }}" class="form-control" />
+	                    </div>
+	                  </div>
+	                </div>
+	            </div>
+	            <div class="form-group">
+	                <label class="col-sm-2 control-label">{{ entry_sqr_cm }}</label>
+					<div class="col-sm-10">
+			            <div class="table-responsive">
+			              <table id="tmd_productdimension" class="table table-striped table-bordered table-hover">
+			                <thead>
+			                  <tr>
+			                    <td class="text-left">{{ entry_fromsqr }}</td>
+			                    <td class="text-left">{{ entry_tosqr }}</td>
+			                    <td class="text-left">{{ entry_sqrprice }}</td>
+			                    <td class="text-left">{{ entry_discount }}</td>
+			                    <td class="text-left">{{ column_action }}</td>
+			                  </tr>
+			                </thead>
+			                <tbody>
+
+			                  {% set tmd_productdimension_row = 0 %}
+			                  {% for product_price in product_prices %}
+			                    <tr id="tmd_productdimension-row{{ tmd_productdimension_row }}">
+			                     
+			                      <td class="text-left"><input type="text" name="product_price[{{ tmd_productdimension_row }}][from_sqr]" value="{{ product_price.from_sqr }}" placeholder="{{ entry_fromsqr }}" class="form-control"/></td>
+			                      <td class="text-  "><input type="text" name="product_price[{{ tmd_productdimension_row }}][to_sqr]" value="{{ product_price.to_sqr }}" placeholder="{{ entry_tosqr }}" class="form-control"/></td>
+			                      <td class="text-left"><input type="text" name="product_price[{{ tmd_productdimension_row }}][price]" value="{{ product_price.price }}" placeholder="{{ entry_sqrprice }}" class="form-control"/></td>
+			                      <td class="text-left">
+			                      	<div class="input-group">
+			                      		<div class="input-group-addon"><i class="fa fa-percent" aria-hidden="true"></i></div>
+			                      		<input type="text" name="product_price[{{ tmd_productdimension_row }}][discount]" value="{{ product_price.discount }}" placeholder="{{ entry_discount }}" class="form-control"/>
+			                      	</div>
+			                      </td>
+			                      <td class="text-left"><button type="button" onclick="$('#tmd_productdimension-row{{ tmd_productdimension_row }}').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>
+			             
+			                    </tr>
+			                    {% set tmd_productdimension_row = tmd_productdimension_row + 1 %}
+			                  {% endfor %}
+			                </tbody>
+
+			                <tfoot>
+			                  <tr>
+			                    <td colspan="4"></td>
+			                    <td class="text-left"><button type="button" onclick="addtmd_productdimension();" data-toggle="tooltip" title="{{ button_discount_add }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button></td>
+			                  </tr>
+			                </tfoot>
+			              </table>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+			{% endif %}
+		]]></add>
+	</operation>
+	<operation error="skip">
+		<search><![CDATA[{{ footer }} ]]></search>
+		<add position="before"><![CDATA[
+		 	{% if productdimension_status %}
+            <script type="text/javascript"><!--
+			  var tmd_productdimension_row = {{ tmd_productdimension_row }};
+
+			  function addtmd_productdimension() {
+			    html = '<tr id="tmd_productdimension-row' + tmd_productdimension_row + '">';
+			    html += '  <td class="text-right"><input type="text" name="product_price[' + tmd_productdimension_row + '][from_sqr]" value="" placeholder="{{ entry_fromsqr }}" class="form-control" /></td>';
+			    html += '  <td class="text-right"><input type="text" name="product_price[' + tmd_productdimension_row + '][to_sqr]" value="" placeholder="{{ entry_tosqr }}" class="form-control" /></td>';
+			    html += '  <td class="text-right"><input type="text" name="product_price[' + tmd_productdimension_row + '][price]" value="" placeholder="{{ entry_sqrprice }}" class="form-control" /></td>';
+			    html += '  <td class="text-right"><div class="input-group"><div class="input-group-addon"><i class="fa fa-percent" aria-hidden="true"></i></div><input type="text" name="product_price[' + tmd_productdimension_row + '][discount]" value="" placeholder="{{ entry_discount }}" class="form-control" /></div></td>';
+			    html += '  <td class="text-left"><button type="button" onclick="$(\'#tmd_productdimension-row' + tmd_productdimension_row + '\').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>';
+			    html += '</tr>';
+
+			    $('#tmd_productdimension tbody').append(html);
+
+			    tmd_productdimension_row++;
+			  }
+         
+			  //--></script>
+			  {% endif %}
+		]]></add>
+	</operation>
+</file>
+
+<file path="catalog/controller/product/product.php">   
+	<operation error="skip">
+		<search><![CDATA[if ($product_info) {]]></search>
+		<add position="before"><![CDATA[
+			    $data['productdimension_status'] = $this->config->get('module_tmd_productdimension_status');
+                if(!empty($data['productdimension_status'])){
+				if (isset($this->request->get['product_id'])) {
+					$data['tmd_product_id'] = $this->request->get['product_id'];
+				} else {
+					$data['tmd_product_id'] = 0;
+				}
+
+				if (isset($this->request->get['manufacturer_id'])) {
+					$data['tmd_manufacturer_id'] = $this->request->get['manufacturer_id'];
+				} else {
+					$data['tmd_manufacturer_id'] = 0;
+				}
+
+				if (isset($this->request->get['path'])) {
+					$path = '';
+					$parts = explode('_', (string)$this->request->get['path']);
+					$data['tmd_category_id'] = (int)array_pop($parts);
+				} else {
+					$data['tmd_category_id'] = 0;
+				}
+
+				$sqr_products = $this->config->get('module_tmd_productdimension_pproducts');
+				if(isset($sqr_products)) {
+					$data['sqr_products'] = $sqr_products;
+				} else {
+					$data['sqr_products']=array();
+				}
+
+				$sqr_manufacturers = $this->config->get('module_tmd_productdimension_manufacturer');
+				if(isset($sqr_manufacturers)) {
+					$data['sqr_manufacturers'] = $sqr_manufacturers;
+				} else {
+					$data['sqr_manufacturers']=array();
+				}
+				$sqr_categories = $this->config->get('module_tmd_productdimension_category');
+				if(isset($sqr_categories)) {
+					$data['sqr_categories'] = $sqr_categories;
+				} else {
+					$data['sqr_categories']=array();
+				}
+				$this->load->language('extension/tmd_productdimension');
+				
+				$status1 = $this->config->get('module_tmd_productdimension_status');
+				if(!empty($status1)){
+					$data['dispay']=true;
+				}else{
+					$data['dispay']=false;
+				}
+				
+				$data['tmd_productdimension'] = $this->load->controller('extension/tmd_productdimension');
+			}
+		]]></add>
+	</operation> 
+</file>
+
+<file path="catalog/view/theme/*/template/product/product.twig">   
+	<operation error="skip">
+		<search><![CDATA[<div id="product"> {% if options %}]]></search>
+		<add position="replace"><![CDATA[
+		<div id="product">
+		{% if not options %}
+
+		{% if dispay %}
+		<div class="tmd_productdimensions"></div>
+		{{ tmd_productdimension }}
+		{% endif %}
+		{% endif %}
+		{% if options %}
+		]]></add>
+	</operation>
+
+	<operation error="skip">
+		<search><![CDATA[<h3>{{ text_option }}</h3>]]></search>
+		<add position="after"><![CDATA[
+		{% if options %}
+		{% if dispay %}
+		<div class="tmd_productdimensions"></div>
+		{{ tmd_productdimension }}
+		{% endif %}
+		{% endif %}
+		]]></add>
+	</operation>
+		
+	<operation error="skip">
+		<search><![CDATA[if (json['error']['option']) {]]></search>
+		<add position="before"><![CDATA[
+		if (json['error']['sqr_height']) {
+          $('#input-sqrheight').after('<div class="text-danger">' + json['error']['sqr_height'] + '</div>');
+        }	
+        if (json['error']['sqr_width']) {
+          $('#input-sqrwidth').after('<div class="text-danger">' + json['error']['sqr_width'] + '</div>');
+        }
+      	if (json['error']['cus_price']) {
+           $('.tmdalert').after('<div class="alert alert-danger alert-dismissible warning">'+json['error']['cus_price']+'<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+        }
+		]]></add>
+	</operation>
+
+	<operation error="skip">
+		<search><![CDATA[<li>{{ text_tax }} {{ tax }}</li>]]></search>
+		<add position="replace"><![CDATA[
+		<li class="tax">{{ text_tax }} {{ tax }}</li>
+		]]></add>
+	</operation>
+</file>
+
+<file path="catalog/view/theme/journal3/template/product/product.twig">   
+	<operation error="skip">
+		<search index="0"><![CDATA[{% if options %}]]></search>
+		<add position="before"><![CDATA[
+		<div id="product" class="product-options">
+		{% if not options %}
+
+		{% if dispay %}
+		<div class="tmd_productdimensions"></div>
+		{{ tmd_productdimension }}
+		{% endif %}
+		{% endif %}
+		]]></add>
+	</operation>
+
+	<operation error="skip">
+		<search><![CDATA[<h3 class="options-title title">{{ text_option }}</h3>]]></search>
+		<add position="before"><![CDATA[
+		{% if options %}
+		{% if dispay %}
+		<div class="tmd_productdimensions"></div>
+		{{ tmd_productdimension }}
+		{% endif %}
+		{% endif %}
+		]]></add>
+	</operation>
+
+	<operation error="skip">
+		<search><![CDATA[<i class="fa fa-angle-up"></i>]]></search>
+		<add position="replace"><![CDATA[
+          <i class="fa fa-angle-up gohide"></i>
+		]]></add>
+	</operation>
+
+	<operation error="skip">
+		<search><![CDATA[<i class="fa fa-angle-down"></i>]]></search>
+		<add position="replace"><![CDATA[
+          <i class="fa fa-angle-down gohide"></i>
+		]]></add>
+	</operation>
+</file>
+
+<file path="catalog/view/theme/journal2/template/product/product.twig">   
+	<operation error="skip">
+		<search index="0"><![CDATA[{% if options %}]]></search>
+		<add position="before"><![CDATA[
+		<div id="product" class="options">
+		{% if not options %}
+
+		{% if dispay %}
+		<div class="tmd_productdimensions"></div>
+		{{ tmd_productdimension }}
+		{% endif %}
+		{% endif %}
+		]]></add>
+	</operation>
+</file>
+
+<file path="system/library/cart/cart.php">
+	<operation error="skip">
+		<search><![CDATA[public function getProducts() {]]></search>
+		<add position="after"><![CDATA[
+           $productdimension_status = $this->config->get('module_tmd_productdimension_status');
+		]]></add>
+	</operation>	
+
+	<operation error="skip">
+		<search><![CDATA[foreach (json_decode($cart['option']) as $product_option_id => $value) {]]></search>
+		<add position="before"><![CDATA[
+          $nwsqrprice = 0;
+		]]></add>
+	</operation>			
+
+	<operation error="skip">
+		<search><![CDATA[foreach (json_decode($cart['option']) as $product_option_id => $value) {]]></search>
+		<add position="after"><![CDATA[
+			   if(!empty($productdimension_status)){
+				$sqr_value='';
+				if($product_option_id=='sqr_price') {	
+					$product_query->row['price'] = $value;
+				   $sqmetterprice=true;
+				}
+
+				if($product_option_id=='sqrprice') {	
+					$nwsqrprice = $value;
+					//$product_query->row['price'] += $value;
+				}
+
+				if($product_option_id=='sqr_height' || $product_option_id=='sqr_width') {	
+					if($product_option_id=='sqr_height') {	
+						$sqr_value =$value;
+						$sqr_name ='Height';
+					}
+
+					if($product_option_id=='sqr_width') {	
+						$sqr_value =$value;
+						$sqr_name ='Width';
+					}
+			
+					$option_data[] = array(
+						'value'  => $sqr_value,
+						'name'  => $sqr_name,
+						'price'  => '',
+						'quantity'  => '',
+						'subtract'  => '',
+						'points'  => '',
+						'weight'  => '',
+						'price_prefix'  => '',
+						'points_prefix'  => '',
+						'weight_prefix'  => '',
+						'product_option_id'=> '',
+						'product_option_value_id'=> '',
+						'option_id'=> '',
+						'option_value_id'=> '',
+						'type'  => ''
+					);
+					if(isset($nwsqrprice)) {
+						$product_query->row['price']= $nwsqrprice;
+					} else {
+						$product_query->row['price']= 0;
+					}
+				  }
+				}
+		]]></add>
+	</operation>
+    	<operation error="skip">
+		<search><![CDATA[$product_discount_query = $this->db->query("SELECT price FROM " . DB_PREFIX . "product_discount WHERE]]></search>
+		<add position="before"><![CDATA[
+		if(!empty($productdimension_status)){	
+	       if(empty($sqmetterprice)){
+	     }  
+		]]></add>
+	</operation>
+
+<operation error="skip">
+		<search><![CDATA[$product_special_query = $this->db->query("SELECT price FROM " . DB_PREFIX . "product_special WHERE]]></search>
+		<add position="before"><![CDATA[
+		 if(!empty($productdimension_status)){	
+			}
+	       if(empty($sqmetterprice)){
+	     }
+		]]></add>
+	</operation>
+
+	<operation error="skip">
+		<search><![CDATA[$price = $product_special_query->row['price'];]]></search>
+		<add position="after"><![CDATA[
+		if(!empty($productdimension_status)){	
+			}
+	      }
+		]]></add>
+	</operation>
+
+</file>
+
+<file path="catalog/controller/checkout/cart.php">
+	<operation error="skip">
+		<search><![CDATA[if (!$json) {]]></search>
+		<add position="before"><![CDATA[
+			if (!empty($this->config->get('module_tmd_productdimension_status'))) {				
+
+				$tmdtext = $this->config->get('module_tmd_productdimension_multi');
+					
+				if(!empty($tmdtext[$this->config->get('config_language_id')]['errorwidth'])){
+					$data['error_width'] = $tmdtext[$this->config->get('config_language_id')]['errorwidth'];
+				} else {
+					$data['error_width'] = $this->language->get('error_width');
+				}
+
+				if(!empty($tmdtext[$this->config->get('config_language_id')]['errorheight'])){
+					$data['error_height'] = $tmdtext[$this->config->get('config_language_id')]['errorheight'];
+				} else {
+					$data['error_height'] = $this->language->get('error_height');
+				}
+
+				if(!empty($tmdtext[$this->config->get('config_language_id')]['erroroption'])){
+					$data['error_erroroption'] = $tmdtext[$this->config->get('config_language_id')]['erroroption'];
+				} else {
+					$data['error_erroroption'] = $this->language->get('error_erroroption');
+				}
+
+				if (isset($this->request->post['width'])) {
+					$width = $this->request->post['width'];
+				} else {
+					$width = 0;
+				}
+
+				if (isset($this->request->post['height'])) {
+					$height = $this->request->post['height'];
+				} else {
+					$height = 0;
+				}
+				$this->load->model('extension/tmd_productdimension');
+				$sqrpriceinfos = $this->model_extension_tmd_productdimension->getSqrPrices($product_id);
+				$infos = $this->model_extension_tmd_productdimension->getTmdProductPricestatus($product_id);
+				if($infos){	
+					$this->load->language('extension/tmd_productdimension');
+					if (empty($option['sqr_height'])) {
+						$json['error']['sqr_height'] = $data['error_height'];
+					}
+					if (empty($option['sqr_width'])) {
+						$json['error']['sqr_width'] = $data['error_width'];
+					}
+
+					if (empty($this->request->post['customoption']['cus_price'])) {
+						$json['error']['cus_price'] = $data['error_erroroption'];
+					}
+				} elseif ($sqrpriceinfos) {
+					$this->load->language('extension/tmd_productdimension');
+					if (empty($option['sqr_height'])) {
+						$json['error']['sqr_height'] = $data['error_height'];
+					}
+					if (empty($option['sqr_width'])) {
+						$json['error']['sqr_width'] = $data['error_width'];
+					}
+
+					if (empty($this->request->post['customoption']['cus_price'])) {
+						$json['error']['cus_price'] = $data['error_erroroption'];
+					}
+				}
+			}
+		]]></add>
+	</operation> 	
+	<operation error="skip">
+		<search><![CDATA[$product_options = $this->model_catalog_product->getProductOptions($this->request->post['product_id']);]]></search>
+		<add position="before"><![CDATA[
+	       if (isset($this->request->post['sqrprice'])) {
+			    $option['sqrprice'] = $this->request->post['sqrprice'];
+            }
+		]]></add>
+	</operation>				
+</file>
+</modification>
